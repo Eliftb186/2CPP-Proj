@@ -5,20 +5,33 @@
 using namespace std;
 
 // Coordonées du click
-int X = 422;
-int Y = 192;
+int X = 1083;
+int Y = 14;
 
-int main() {
-  // Create MouseDown event
-  CGEventRef click1_down = CGEventCreateMouseEvent(
-      NULL, kCGEventLeftMouseDown, CGPointMake(X, Y), kCGMouseButtonRight);
+void click(int x, int y, int n, int sleep_time, bool right_click) {
+  CGEventRef click1_down;  // Declare the variables outside the if-else block
+  CGEventRef click1_up;
 
-  // Create MouseUp event
-  CGEventRef click1_up = CGEventCreateMouseEvent(
-      NULL, kCGEventLeftMouseUp, CGPointMake(X, Y), kCGMouseButtonRight);
+  if (right_click) {
+    // Create MouseDown event
+    click1_down = CGEventCreateMouseEvent(
+        NULL, kCGEventLeftMouseDown, CGPointMake(x, y), kCGMouseButtonRight);
 
-  // Click 10 times
-  for (int i = 0; i < 3; i++) {
+    // Create MouseUp event
+    click1_up = CGEventCreateMouseEvent(NULL, kCGEventLeftMouseUp,
+                                        CGPointMake(x, y), kCGMouseButtonRight);
+  } else {
+    // Create MouseDown event
+    click1_down = CGEventCreateMouseEvent(
+        NULL, kCGEventLeftMouseDown, CGPointMake(x, y), kCGMouseButtonLeft);
+
+    // Create MouseUp event
+    click1_up = CGEventCreateMouseEvent(NULL, kCGEventLeftMouseUp,
+                                        CGPointMake(x, y), kCGMouseButtonLeft);
+  }
+
+  // Click n times
+  for (int i = 0; i < n; i++) {
     // Mouse down
     CGEventPost(kCGHIDEventTap, click1_down);
     cout << "Click" << endl;
@@ -27,8 +40,17 @@ int main() {
     // Mouse up
     CGEventPost(kCGHIDEventTap, click1_up);
     cout << "Release" << endl;
-    sleep(1);
+    sleep(sleep_time);
   }
+
+  // Release the events
+  CFRelease(click1_down);
+  CFRelease(click1_up);
+}
+
+int main() {
+  // Click 10 times at (1083, 14) with a sleep time of 1 second
+  click(X, Y, 2, 1, false);
 
   return 0;
 }
