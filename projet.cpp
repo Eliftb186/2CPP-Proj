@@ -42,8 +42,6 @@ void click(int x, int y, int n, int sleep_time, bool right_click) {
 }
 
 void welcom(void) {
-  int name;
-
   system("clear");
   cout << "Bienvenue dans le programme d'autoclicker" << endl;
   cout << endl;
@@ -69,66 +67,139 @@ class Task {
          << " |" << endl;
     cout << "------------------------------------------------------------------"
          << endl;
+    cout << endl;
   }
 
-  void addTask() {
-    cout << "Entrez la position x : ";
-    cin >> posx;
-    cout << "Entrez la position y : ";
-    cin >> posy;
-    cout << "Entrez le nombre de clics : ";
-    cin >> nbClick;
-    cout << "Entrez le temps de pause entre chaque clic : ";
-    cin >> sleep_time;
-    cout << "Voulez-vous faire un clic droit ? (y/n)" << endl;
-    cin >> c;
-    if (c == 'y') {
-      right_click = true;
-    } else {
-      right_click = false;
+  void executeTask() { click(posx, posy, nbClick, sleep_time, right_click); }
+};
+
+class TaskList {
+ public:
+  vector<Task> tasks;
+
+  TaskList() {}
+
+  void addTask(Task task) { tasks.push_back(task); }
+
+  void displayTasks() {
+    if (tasks.size() == 0) {
+      cout << "Aucune tache" << endl;
+      cout << endl;
+      return;
+    }
+
+    for (int i = 0; i < tasks.size(); i++) {
+      tasks[i].displayTask();
     }
   }
+
+  void executeTasks() {
+    for (int i = 0; i < tasks.size(); i++) {
+      click(tasks[i].posx, tasks[i].posy, tasks[i].nbClick, tasks[i].sleep_time,
+            tasks[i].right_click);
+    }
+  }
+
+  void deleteTask(int index) { tasks.erase(tasks.begin() + index); }
+
+  void deleteAllTasks() {
+    tasks.clear();
+    cout << "Toutes les taches ont ete supprimees" << endl;
+    cout << endl;
+  }
+
+  void editTask(int index, Task task) { tasks[index] = task; }
 };
 
 int main() {
   // click(30, 30, 2, 1, false);
   welcom();
 
+  TaskList taskList;
+
+  int choice = 0;
   int x, y, n, sleep_time;
   bool right_click;
-  char c;
 
-  vector<Task> tasks;
+  while (choice != 6) {
+    cout << "1. Ajouter une tache" << endl;
+    cout << "2. Afficher les taches" << endl;
+    cout << "3. Supprimer une tache" << endl;
+    cout << "4. Supprimer toutes les taches" << endl;
+    cout << "5. Modifier une tache" << endl;
+    cout << "6. Executer les taches" << endl;
+    cout << "7. Quitter" << endl;
+    cout << endl;
+    cout << "Votre choix : ";
+    cin >> choice;
+    cout << endl;
 
-  while (true) {
-    cout << "Voulez-vous ajouter une tâche ? (y/n)" << endl;
-    cin >> c;
+    switch (choice) {
+      case 1:
+        cout << "Position x : ";
+        cin >> x;
+        cout << "Position y : ";
+        cin >> y;
+        cout << "Nombre de click : ";
+        cin >> n;
+        cout << "Temps de pause entre chaque click : ";
+        cin >> sleep_time;
+        cout << "Click droit ? (0/1) : ";
+        cin >> right_click;
+        cout << endl;
+        taskList.addTask(Task(x, y, n, sleep_time, right_click));
+        break;
 
-    if (c == 'y') {
-      cout << "Entrez la position x : ";
-      cin >> x;
-      cout << "Entrez la position y : ";
-      cin >> y;
-      cout << "Entrez le nombre de clics : ";
-      cin >> n;
-      cout << "Entrez le temps de pause entre chaque clic : ";
-      cin >> sleep_time;
-      cout << "Voulez-vous faire un clic droit ? (y/n)" << endl;
-      cin >> c;
-      if (c == 'y') {
-        right_click = true;
-      } else {
-        right_click = false;
-      }
+      case 2:
+        taskList.displayTasks();
+        break;
 
-      Task task(x, y, n, sleep_time, right_click);
-      tasks.push_back(task);
-    } else {
-      break;
+      case 3:
+        int index;
+        cout << "Index de la tache a supprimer : ";
+        cin >> index;
+        cout << endl;
+        taskList.deleteTask(index);
+        break;
+
+      case 4:
+        taskList.deleteAllTasks();
+        break;
+
+      case 5:
+        int index2;
+        cout << "Index de la tache a modifier : ";
+        cin >> index2;
+        cout << "Position x : ";
+        cin >> x;
+        cout << "Position y : ";
+        cin >> y;
+        cout << "Nombre de click : ";
+        cin >> n;
+        cout << "Temps de pause entre chaque click : ";
+        cin >> sleep_time;
+        cout << "Click droit ? (0/1) : ";
+        cin >> right_click;
+        taskList.editTask(index2, Task(x, y, n, sleep_time, right_click));
+        cout << endl;
+        break;
+
+      case 6:
+        cout << "Execution des taches" << endl;
+        taskList.executeTasks();
+        cout << "Fin de l'execution des taches" << endl;
+        cout << endl;
+        break;
+
+      case 7:
+        cout << "Au revoir" << endl;
+        break;
+
+      default:
+        cout << "Erreur, veuillez choisir un nombre entre 1 et 6" << endl;
+        break;
     }
   }
-
-  tasks[0].displayTask();
 
   return 0;
 }
