@@ -62,10 +62,31 @@ class Task {
       : posx(x), posy(y), nbClick(n), sleep_time(sleep), right_click(right) {}
 
   void displayTask() {
-    cout << "-----------------------------------------" << endl;
-    cout << "| " << posx << " " << posy << " " << nbClick << " " << sleep_time
-         << " " << right_click << "|" << endl;
-    cout << "-----------------------------------------" << endl;
+    cout << "------------------------------------------------------------------"
+         << endl;
+    cout << "| posx " << posx << " | posy " << posy << " | nbClick " << nbClick
+         << " | sleep_time " << sleep_time << " | right_click " << right_click
+         << " |" << endl;
+    cout << "------------------------------------------------------------------"
+         << endl;
+  }
+
+  void addTask() {
+    cout << "Entrez la position x : ";
+    cin >> posx;
+    cout << "Entrez la position y : ";
+    cin >> posy;
+    cout << "Entrez le nombre de clics : ";
+    cin >> nbClick;
+    cout << "Entrez le temps de pause entre chaque clic : ";
+    cin >> sleep_time;
+    cout << "Voulez-vous faire un clic droit ? (y/n)" << endl;
+    cin >> c;
+    if (c == 'y') {
+      right_click = true;
+    } else {
+      right_click = false;
+    }
   }
 };
 
