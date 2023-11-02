@@ -1,4 +1,5 @@
 // g++ projet.cpp -Wall -framework ApplicationServices
+
 #include <ApplicationServices/ApplicationServices.h>
 #include <stdlib.h>
 
@@ -45,7 +46,6 @@ void welcom(void) {
   system("clear");
   cout << "Bienvenue dans le programme d'autoclicker" << endl;
   cout << endl;
-  cout << "-----------------------------------------" << endl;
 }
 
 class Task {
@@ -83,20 +83,21 @@ class TaskList {
 
   void displayTasks() {
     if (tasks.size() == 0) {
+      system("clear");
       cout << "Aucune tache" << endl;
       cout << endl;
       return;
-    }
-
-    for (int i = 0; i < tasks.size(); i++) {
-      tasks[i].displayTask();
+    } else {
+      system("clear");
+      for (int i = 0; i < tasks.size(); i++) {
+        tasks[i].displayTask();
+      }
     }
   }
 
   void executeTasks() {
     for (int i = 0; i < tasks.size(); i++) {
-      click(tasks[i].posx, tasks[i].posy, tasks[i].nbClick, tasks[i].sleep_time,
-            tasks[i].right_click);
+      tasks[i].executeTask();
     }
   }
 
@@ -112,7 +113,6 @@ class TaskList {
 };
 
 int main() {
-  // click(30, 30, 2, 1, false);
   welcom();
 
   TaskList taskList;
@@ -121,7 +121,7 @@ int main() {
   int x, y, n, sleep_time;
   bool right_click;
 
-  while (choice != 6) {
+  while (choice != 7) {
     cout << "1. Ajouter une tache" << endl;
     cout << "2. Afficher les taches" << endl;
     cout << "3. Supprimer une tache" << endl;
@@ -147,7 +147,10 @@ int main() {
         cout << "Click droit ? (0/1) : ";
         cin >> right_click;
         cout << endl;
+        system("clear");
         taskList.addTask(Task(x, y, n, sleep_time, right_click));
+        cout << "Tache ajoutee" << endl;
+        cout << endl;
         break;
 
       case 2:
@@ -160,10 +163,12 @@ int main() {
         cin >> index;
         cout << endl;
         taskList.deleteTask(index);
+        system("clear");
         break;
 
       case 4:
         taskList.deleteAllTasks();
+        system("clear");
         break;
 
       case 5:
@@ -181,22 +186,27 @@ int main() {
         cout << "Click droit ? (0/1) : ";
         cin >> right_click;
         taskList.editTask(index2, Task(x, y, n, sleep_time, right_click));
-        cout << endl;
+        system("clear");
         break;
 
       case 6:
+        system("clear");
         cout << "Execution des taches" << endl;
+        cout << endl;
         taskList.executeTasks();
+        cout << endl;
         cout << "Fin de l'execution des taches" << endl;
         cout << endl;
         break;
 
       case 7:
+        system("clear");
         cout << "Au revoir" << endl;
         break;
 
       default:
-        cout << "Erreur, veuillez choisir un nombre entre 1 et 6" << endl;
+        cout << "Erreur, veuillez choisir un nombre entre 1 et 7" << endl;
+        cout << endl;
         break;
     }
   }
