@@ -4,6 +4,7 @@
 #include <stdlib.h>
 
 #include <iostream>
+#include <string>
 using namespace std;
 
 void click(int x, int y, int n, int sleep_time, bool right_click) {
@@ -55,11 +56,18 @@ class Task {
   int nbClick;
   int sleep_time;
   bool right_click;
+  string name;
 
-  Task(int x, int y, int n, int sleep, bool right)
-      : posx(x), posy(y), nbClick(n), sleep_time(sleep), right_click(right) {}
+  Task(int x, int y, int n, int sleep, bool right, string name)
+      : posx(x),
+        posy(y),
+        nbClick(n),
+        sleep_time(sleep),
+        right_click(right),
+        name(name) {}
 
   void displayTask() {
+    cout << name << endl;
     cout << "------------------------------------------------------------------"
          << endl;
     cout << "| posx " << posx << " | posy " << posy << " | nbClick " << nbClick
@@ -109,7 +117,7 @@ class TaskList {
     cout << endl;
   }
 
-  void editTask(int index, Task task) { tasks[index] = task; }
+  void editTask(int index, Task task) { tasks[index + 1] = task; }
 };
 
 int main() {
@@ -120,6 +128,7 @@ int main() {
   int choice = 0;
   int x, y, n, sleep_time;
   bool right_click;
+  string name;
 
   while (choice != 7) {
     cout << "1. Ajouter une tache" << endl;
@@ -136,6 +145,8 @@ int main() {
 
     switch (choice) {
       case 1:
+        cout << "Nom de la tache : ";
+        cin >> name;
         cout << "Position x : ";
         cin >> x;
         cout << "Position y : ";
@@ -148,7 +159,7 @@ int main() {
         cin >> right_click;
         cout << endl;
         system("clear");
-        taskList.addTask(Task(x, y, n, sleep_time, right_click));
+        taskList.addTask(Task(x, y, n, sleep_time, right_click, name));
         cout << "Tache ajoutee" << endl;
         cout << endl;
         break;
@@ -185,7 +196,7 @@ int main() {
         cin >> sleep_time;
         cout << "Click droit ? (0/1) : ";
         cin >> right_click;
-        taskList.editTask(index2, Task(x, y, n, sleep_time, right_click));
+        taskList.editTask(index2, Task(x, y, n, sleep_time, right_click, name));
         system("clear");
         break;
 
