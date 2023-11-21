@@ -73,6 +73,11 @@ class Board {
   vector<vector<int>> cases;
   int size = 20;
 
+  /**
+   * @brief Construct a new Board object
+   *
+   * @param nbPlayers
+   */
   Board(int nbPlayers) {
     if (nbPlayers > 4) {
       size = 30;
@@ -200,7 +205,7 @@ class LayingGrass {
       int startY = rand() % size;
 
       // Nombre de déplacements aléatoires
-      int numMoves = rand() % (2 * size) + (2 * size);
+      int numMoves = rand() % (2 * size) + (3 * size);
 
       // Déplacements possibles : haut, bas, droite, gauche
       int directions[4][2] = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
@@ -222,9 +227,34 @@ class LayingGrass {
         }
       }
 
+      // on suprimme les lignes et colonnes vides
+      for (int i = 0; i < tileMatrix.size(); i++) {
+        if (tileMatrix[i] == vector<int>(size, 0)) {
+          tileMatrix.erase(tileMatrix.begin() + i);
+          i--;
+        }
+      }
+      for (int i = 0; i < tileMatrix[0].size(); i++) {
+        bool empty = true;
+        for (int j = 0; j < tileMatrix.size(); j++) {
+          if (tileMatrix[j][i] != 0) {
+            empty = false;
+            break;
+          }
+        }
+        if (empty) {
+          for (int j = 0; j < tileMatrix.size(); j++) {
+            tileMatrix[j].erase(tileMatrix[j].begin() + i);
+          }
+          i--;
+        }
+      }
+
+      // on ajoute la tuile à la liste
       Tiles tile;
       tile.id = tot;
       tile.tile = tileMatrix;
+      tile.playerName = "";
       tileList.push_back(tile);
     }
 
@@ -232,13 +262,14 @@ class LayingGrass {
   }
 
   /**
-   * @brief print the tile list
+   * @brief print the tile list for debug
    *
    * @param tileList the list of tiles
    */
   void printTileList(vector<Tiles> tileList) {
     for (int i = 0; i < tileList.size(); i++) {
-      cout << "Tuile " << tileList[i].id + 1 << endl;
+      cout << "Tuile " << tileList[i].id + 1 << " de " << tileList[i].playerName
+           << endl;
       for (int j = 0; j < tileList[i].tile.size(); j++) {
         for (int k = 0; k < tileList[i].tile[0].size(); k++) {
           if (tileList[i].tile[j][k] == 1) {
@@ -255,12 +286,14 @@ class LayingGrass {
 };
 
 /**
- * @brief Create a Players object
+ * @brief Create the Players
  *
  * @return vector<Player>
  */
 vector<Player> createPlayers() {
   int nbJoueurs;
+  vector<Player> players;
+
   cout << "Enter the number of players (between 2 and 9)" << endl;
   cin >> nbJoueurs;
   while (nbJoueurs < 2 || nbJoueurs > 9) {
@@ -268,12 +301,13 @@ vector<Player> createPlayers() {
          << endl;
     cin >> nbJoueurs;
   }
-  vector<Player> players;
+
   for (int i = 0; i < nbJoueurs; i++) {
     Player player;
     player.createPlayer();
     players.push_back(player);
   }
+
   return players;
 }
 
@@ -284,8 +318,8 @@ int main() {
 
   // vector<Player> players = createPlayers();
 
-  // Board board(9);
-  // board.printBord();
+  Board board(9);
+  board.printBord();
 
   LayingGrass layingGrass;
   vector<LayingGrass::Tiles> tileList = layingGrass.createTileList();
