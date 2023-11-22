@@ -11,12 +11,12 @@ class Player {
  public:
   string name;
   int couponEchange;
-  int color;
+  int colorInt;
 
   Player(vector<string> availableColors) {
     name = choseName();
     couponEchange = 1;
-    color = choseColor(availableColors);
+    colorInt = choseColor(availableColors);
   }
 
   string choseName() {
@@ -30,31 +30,22 @@ class Player {
       cout << i + 1 << " : " << availableColors[i] << endl;
     }
     cout << "Enter the player's color : ";
-    cin >> color;
-    while (color < 1 || color > availableColors.size() ||
-           availableColors[color - 1] == "❌") {
+    cin >> colorInt;
+    while (colorInt < 1 || colorInt > availableColors.size() ||
+           availableColors[colorInt - 1] == "❌") {
       for (int i = 0; i < availableColors.size(); i++) {
         cout << i + 1 << " : " << availableColors[i] << endl;
       }
       cout << "Enter the player's color : ";
-      cin >> color;
+      cin >> colorInt;
     }
-    color--;
-    return color;
+    colorInt--;
+    return colorInt;
   }
 
   string getName() { return name; };
   int getCouponEchange() { return couponEchange; };
-
-  string getColor(string arg = "emoji") {
-    vector<string> colors = {"⬛️", "⬜️", "🟩", "🟦", "🟨",
-                             "🟧", "🟥", "🟫", "🟪"};
-    if (arg == "int") {
-      return to_string(color);
-    } else {
-      return colors[color];
-    }
-  }
+  int getColor() { return colorInt; }
 };
 
 class Board {
@@ -86,7 +77,7 @@ class Board {
       } while (find(positions.begin(), positions.end(), make_pair(x, y)) !=
                positions.end());
 
-      board[x][y] = stoi(players[i].getColor("int"));
+      board[x][y] = players[i].getColor();
       positions.push_back(make_pair(x, y));
     }
   }
@@ -114,29 +105,33 @@ class Board {
       for (int j = 0; j < board[0].size(); j++) {
         static const map<int, string> symboles = {
             {0, "⬛️"}, {1, "⬜️"}, {2, "🟩"}, {3, "🟦"}, {4, "🟨"},
-            {5, "🟧"}, {6, "🟥"}, {7, "🟫"}, {8, "🟪"}, {100, "🔳"},
-        };
+            {5, "🟧"}, {6, "🟥"}, {7, "🟫"}, {8, "🟪"}, {100, "🔳"}};
 
-        // Assurez-vous de remplacer 'valeur' par le bon élément de votre
-        // tableau 'board'
         int valeur = board[i][j];
         auto it = symboles.find(valeur);
         if (it != symboles.end()) {
-          std::cout << it->second;
+          cout << it->second;
         } else {
-          std::cout << "❌";
+          cout << "❌";
         }
       }
       cout << endl;
     }
     cout << endl;
   }
+
+  void placeTile(vector<vector<int>> tile, int x, int y) {
+    for (int i = 0; i < tile.size(); i++) {
+      for (int j = 0; j < tile[0].size(); j++) {
+        if (tile[i][j] == 1) {
+          board[x + i][y + j] = 0;
+        }
+      }
+    }
+  }
 };
 
-class Tuile {
- public:
-  vector<vector<int>> tuile;
-
+class Tile {
  public:
   struct Tiles {
     int id;
@@ -231,9 +226,9 @@ class Tuile {
     }
   }
 
-  void flipTuile() { reverse(tuile.begin(), tuile.end()); }
+  void flipTile() { reverse(Tiles.tile., tuile.end()); }
 
-  void rotateTuile() {
+  void rotateTile() {
     // Transposer la matrice
     for (size_t i = 0; i < tuile.size(); ++i) {
       for (size_t j = i + 1; j < tuile[i].size(); ++j) {
@@ -261,35 +256,15 @@ class Tuile {
   }
 };
 
-vector<Player> createPlayers() {
-  int nbPlayers;
-  vector<string> colors = {"⬛️", "⬜️", "🟩", "🟦", "🟨",
-                           "🟧", "🟥", "🟫", "🟪"};
-  cout << "Enter the number of players (2-9) : ";
-  cin >> nbPlayers;
-  while (nbPlayers < 2 || nbPlayers > 9) {
-    cout << "Enter the number of players (2-9) : ";
-    cin >> nbPlayers;
-  }
-  vector<Player> players;
-  for (int i = 0; i < nbPlayers; i++) {
-    Player player(colors);
-    cout << endl;
-    colors[stoi(player.getColor("int"))] = "❌";
-    players.push_back(player);
-  }
-  return players;
-};
-
 class Game {
  public:
   void printSingleTile(vector<vector<int>> tile) {
     for (int i = 0; i < tile.size(); i++) {
       for (int j = 0; j < tile[0].size(); j++) {
         if (tile[i][j] == 1) {
-          cout << "🟩";
+          cout << "🥔";
         } else {
-          cout << "⬜️";
+          cout << "  ";
         }
       }
       cout << endl;
@@ -305,12 +280,36 @@ class Game {
   }
 };
 
+vector<Player> createPlayers() {
+  int nbPlayers;
+  vector<string> colors = {"⬛️", "⬜️", "🟩", "🟦", "🟨",
+                           "🟧", "🟥", "🟫", "🟪"};
+  cout << "Enter the number of players (2-9) : ";
+  cin >> nbPlayers;
+  while (nbPlayers < 2 || nbPlayers > 9) {
+    cout << "Enter the number of players (2-9) : ";
+    cin >> nbPlayers;
+  }
+  vector<Player> players;
+  for (int i = 0; i < nbPlayers; i++) {
+    Player player(colors);
+    cout << endl;
+    colors[player.getColor()] = "❌";
+    players.push_back(player);
+  }
+  return players;
+};
+
 int main() {
+  // variables
   char answer;
 
+  // on efface la console
   system("clear");
+  // on crée les joueurs
   vector<Player> players = createPlayers();
 
+  // on crée le plateau et on l'affiche avec les tuiles de départ
   Board board(players);
 
   cout << "do you want to play with the default tiles ? (y/n) : ";
@@ -324,9 +323,27 @@ int main() {
     // on joue avec les tuiles du fichier tiles.cpp
     system("clear");
     board.printBoard();
-    cout << "Tuile 1" << endl;
     Game game;
-    game.printMultipleTiles(allTiles);
+    cout << "Tile to place : " << endl;
+    game.printSingleTile(allTiles[0].shape);
+    cout << endl;
+    cout << "You can rotatate, flip or place the tile (r/f/p) : ";
+    cin >> answer;
+    while (answer != 'r' && answer != 'f' && answer != 'p') {
+      cout << "You can rotatate, flip or place the tile (r/f/p) : ";
+      cin >> answer;
+    }
+    if (answer == 'r') {
+      allTiles[0].shape.rotateTuile();
+    } else if (answer == 'f') {
+      allTiles[0].flipTuile();
+    } else {
+      cout << "Enter the position of the tile (x y) : ";
+      int x, y;
+      cin >> x >> y;
+      board.placeTile(allTiles[0].shape, x, y);
+    }
+
   } else {
     // on joue avec les tuiles genérer aléatoirement
     Tuile tuile;
