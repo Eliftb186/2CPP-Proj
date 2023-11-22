@@ -281,42 +281,56 @@ vector<Player> createPlayers() {
   return players;
 };
 
+class Game {
+ public:
+  void printSingleTile(vector<vector<int>> tile) {
+    for (int i = 0; i < tile.size(); i++) {
+      for (int j = 0; j < tile[0].size(); j++) {
+        if (tile[i][j] == 1) {
+          cout << "🟩";
+        } else {
+          cout << "⬜️";
+        }
+      }
+      cout << endl;
+    }
+    cout << endl;
+  }
+
+  void printMultipleTiles(vector<Tile> tiles) {
+    for (int i = 0; i < 5; i++) {
+      printSingleTile(tiles[i].shape);
+      cout << endl;
+    }
+  }
+};
+
 int main() {
+  char answer;
+
   system("clear");
   vector<Player> players = createPlayers();
 
   Board board(players);
-  board.printBoard();
 
   cout << "do you want to play with the default tiles ? (y/n) : ";
-  char answer;
   cin >> answer;
+
   while (answer != 'y' && answer != 'n') {
     cout << "do you want to play with the default tiles ? (y/n) : ";
     cin >> answer;
   }
   if (answer == 'y') {
-    // affiche allTiles
-    for (int i = 0; i < 15; i++) {
-      cout << "Tuile " << allTiles[i].id + 1 << " de " << allTiles[i].playerName
-           << endl;
-      for (int j = 0; j < allTiles[i].tile.size(); j++) {
-        for (int k = 0; k < allTiles[i].tile[0].size(); k++) {
-          if (allTiles[i].tile[j][k] == 1) {
-            cout << "🟩";
-          } else {
-            cout << "⬜️";
-          }
-        }
-        cout << endl;
-      }
-      cout << endl;
-    }
+    // on joue avec les tuiles du fichier tiles.cpp
+    system("clear");
+    board.printBoard();
+    cout << "Tuile 1" << endl;
+    Game game;
+    game.printMultipleTiles(allTiles);
   } else {
+    // on joue avec les tuiles genérer aléatoirement
     Tuile tuile;
     vector<Tuile::Tiles> tileList = tuile.createTileList();
-    tuile.printTilesListDebug(tileList);
   }
-
   return 0;
 }

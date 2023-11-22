@@ -2,13 +2,16 @@
 #include <vector>
 using namespace std;
 
-struct Tiles {
+#include <iostream>
+#include <vector>
+
+struct Tile {
   int id;
-  string playerName;
-  vector<vector<int>> tile;
+  string name;
+  vector<vector<int>> shape;
 };
 
-Tiles allTiles[] = {
+vector<Tile> allTiles = {
     {1, "", {{1, 0, 0}, {1, 1, 1}}},
     {2, "", {{0, 1, 0}, {0, 1, 0}, {1, 1, 1}}},
     {3, "", {{0, 1, 0}, {1, 1, 1}, {0, 1, 0}}},
