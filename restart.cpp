@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <iostream>
 #include <map>
 #include <vector>
@@ -24,10 +25,10 @@ class Player {
   vector<int> choseStartingPosition() {
     vector<int> position;
     int pos;
-    cout << "row number :";
+    cout << "row number : ";
     cin >> pos;
     position.push_back(pos);
-    cout << "column number :";
+    cout << "column number : ";
     cin >> pos;
     position.push_back(pos);
     return position;
@@ -36,6 +37,9 @@ class Player {
   string choseName() {
     cout << "Enter the player's name : ";
     cin >> name;
+    if (name == "patate") {
+      name = "🥔";
+    }
     return name;
   }
 
@@ -96,7 +100,7 @@ class Game {
     if (choice == 'o') {
       tiles = initTilesStandard();
     } else {
-      cout << "not implemented yet" << endl;
+      initTilesFromNowere();
     }
     initBoard(players);
   }
@@ -108,7 +112,7 @@ class Game {
       board = vector<vector<int>>(30, vector<int>(30, 100));
     }
     for (int i = 0; i < players.size(); i++) {
-      cout << endl;
+      system("clear");
       printBoard();
       cout << endl;
       cout << "Enter " << players[i].name << "'s starting position" << endl;
@@ -251,10 +255,203 @@ class Game {
     }
     cout << endl;
   }
+
+  void printTile(Tiles tile) {
+    cout << endl;
+    for (int i = 0; i < tile.tile.size(); i++) {
+      for (int j = 0; j < tile.tile[0].size(); j++) {
+        if (tile.tile[i][j] == 1) {
+          cout << "🔳";
+        } else {
+          cout << "  ";
+        }
+      }
+      cout << endl;
+    }
+    cout << endl;
+  }
+
+  void placeTile(Player player) {
+    cout << endl;
+    cout << "Enter the tile's position : " << endl;
+    vector<int> position = player.choseStartingPosition();
+    while (!canPlaceTile(tiles[0], position)) {
+      cout << "❌ Invalid position ❌" << endl;
+      cout << "Enter the tile's position : " << endl;
+      position = player.choseStartingPosition();
+    }
+    for (int i = 0; i < tiles[0].tile.size(); i++) {
+      for (int j = 0; j < tiles[0].tile[0].size(); j++) {
+        if (tiles[0].tile[i][j] == 1) {
+          board[position[0] + i][position[1] + j] = player.colorInt;
+        }
+      }
+    }
+    tiles[0].playerName = player.colorInt;
+    tiles.erase(tiles.begin());
+  }
+
+  void exchangeTile() {
+    // on affiche les 5 prochaines tuiles
+    cout << endl;
+    cout << "Your next tiles : " << endl;
+    for (int i = 0; i < 5; i++) {
+      printTile(tiles[i]);
+    }
+    // on demande quelle tuile on veut échanger
+    cout << endl;
+    cout << "Enter the tile's id you wanna exchange : ";
+    int id;
+    cin >> id;
+    while (id < 1 || id > 5) {
+      cout << "❌ Invalid id ❌" << endl;
+      cout << "Enter the tile's id you wanna exchange : ";
+      cin >> id;
+    }
+    // on ramène la tuile au début de la liste
+    tiles.erase(tiles.begin() + id - 1);
+    tiles.insert(tiles.begin(), tiles[id - 1]);
+  }
+
+  void printCurrentTile() {
+    cout << "Your tile : " << endl;
+    printTile(tiles[0]);
+  }
+
+  bool canPlaceTile(Tiles tile, vector<int> position) {
+    // on ne peux pas superposer les tuiles
+    for (int i = 0; i < tile.tile.size(); i++) {
+      for (int j = 0; j < tile.tile[0].size(); j++) {
+        if (tile.tile[i][j] == 1) {
+          if (board[position[0] + i][position[1] + j] != 100) {
+            cout << "can't superpose tiles" << endl;
+            return false;
+          }
+        }
+      }
+    }
+    // on ne peux pas placer une tuile en dehors du board
+    if (position[0] < 0 || position[0] >= board.size() || position[1] < 0 ||
+        position[1] >= board[0].size()) {
+      cout << "out of bounds" << endl;
+      return false;
+    }
+    // on ne peux pas la placer si elle n'est pas connectée à une autre tuile
+    bool connected = false;
+    for (int i = 0; i < tile.tile.size(); i++) {
+      for (int j = 0; j < tile.tile[0].size(); j++) {
+        if (tile.tile[i][j] == 1) {
+          if (board[position[0] + i - 1][position[1] + j] != 100 ||
+              board[position[0] + i + 1][position[1] + j] != 100 ||
+              board[position[0] + i][position[1] + j - 1] != 100 ||
+              board[position[0] + i][position[1] + j + 1] != 100) {
+            connected = true;
+          }
+        }
+      }
+    }
+    if (!connected) {
+      cout << "not connected" << endl;
+      return false;
+    }
+    return true;
+  }
+
+  void flipTile(Tiles tile) { reverse(tile.tile.begin(), tile.tile.end()); }
+
+  void rotateTile(Tiles tile) {
+    // Make a copy of the tile
+    Tiles rotatedTile = tile;
+
+    // Transposer la matrice
+    for (size_t i = 0; i < rotatedTile.tile.size(); ++i) {
+      for (size_t j = i + 1; j < rotatedTile.tile[i].size(); ++j) {
+        swap(rotatedTile.tile[i][j], rotatedTile.tile[j][i]);
+      }
+    }
+
+    // Inverser chaque ligne de la matrice
+    for (size_t i = 0; i < rotatedTile.tile.size(); ++i) {
+      reverse(rotatedTile.tile[i].begin(), rotatedTile.tile[i].end());
+    }
+
+    // Update the original tile with the rotated tile
+    tile = rotatedTile;
+  }
+
+  void play() {
+    bool end = false;
+    while (!end) {
+      // on joue pour chaque joueur
+      for (int i = 0; i < players.size(); i++) {
+        system("clear");
+        printBoard();
+        cout << endl;
+        cout << players[i].name << " : " << endl;
+        printCurrentTile();
+        cout << endl;
+
+        int choice;
+        do {
+          system("clear");
+          printBoard();
+          printCurrentTile();
+          cout << "1 : place a tile" << endl;
+          cout << "2 : exchange a tile" << endl;
+          cout << "3 : rotate tile" << endl;
+          cout << "4 : flip tile" << endl;
+          cout << "Enter your choice : ";
+          cin >> choice;
+
+          while (choice < 1 || choice > 4) {
+            cout << "❌ Invalid choice ❌" << endl;
+            cout << "Enter your choice : ";
+            cin >> choice;
+          }
+
+          if (choice == 1) {
+            placeTile(players[i]);
+          } else if (choice == 2) {
+            system("clear");
+            printBoard();
+            exchangeTile();
+            system("clear");
+            printBoard();
+            printCurrentTile();
+            placeTile(players[i]);
+          } else if (choice == 3) {
+            int rotateChoice;
+            do {
+              system("clear");
+              printBoard();
+              rotateTile(tiles[0]);
+              system("clear");
+              printBoard();
+              printCurrentTile();
+              cout << "Rotate again? (1: Yes, 0: No) : ";
+              cin >> rotateChoice;
+            } while (rotateChoice == 1);
+            system("clear");
+            printBoard();
+            printCurrentTile();
+            placeTile(players[i]);
+          } else if (choice == 4) {
+            system("clear");
+            printBoard();
+            flipTile(tiles[0]);
+            system("clear");
+            printBoard();
+            printCurrentTile();
+            placeTile(players[i]);
+          }
+        } while (choice != 1);
+      }
+    }
+  }
 };
 
 int main() {
   system("clear");
   Game game;
-  game.printBoard();
+  game.play();
 }
