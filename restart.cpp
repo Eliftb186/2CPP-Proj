@@ -5,7 +5,7 @@ using namespace std;
 
 struct Tiles {
   int id;
-  string playerName;
+  int playerName;
   vector<vector<int>> tile;
 };
 
@@ -84,12 +84,9 @@ class Game {
       colors[players[i].colorInt] = "❌";
     }
 
-    // initialisation du plateau en fonction du nombre de joueurs
-    initBoard(players);
-
-    char choice;
     cout << endl;
-    cout << "you wanna play with the old or new tiles (o/n) ? : " << endl;
+    char choice;
+    cout << "you wanna play with the old or new tiles (o/n) ? : ";
     cin >> choice;
     while (choice != 'o' && choice != 'n') {
       cout << "❌ Invalid choice ❌" << endl;
@@ -97,44 +94,55 @@ class Game {
       cin >> choice;
     }
     if (choice == 'o') {
-      initTilesFromPDF();
+      tiles = initTilesStandard();
     } else {
-      initTilesFromNowere();
+      cout << "not implemented yet" << endl;
     }
+    initBoard(players);
   }
 
   void initBoard(vector<Player> players) {
+    if (players.size() <= 4) {
+      board = vector<vector<int>>(20, vector<int>(20, 100));
+    } else {
+      board = vector<vector<int>>(30, vector<int>(30, 100));
+    }
     for (int i = 0; i < players.size(); i++) {
+      cout << endl;
+      printBoard();
       cout << endl;
       cout << "Enter " << players[i].name << "'s starting position" << endl;
       vector<int> pos = players[i].choseStartingPosition();
+      board[pos[0]][pos[1]] = players[i].colorInt;
     }
   }
 
-  void initTilesFromPDF() {
-    tiles = {
-        {1, "", {{1, 0, 0}, {1, 1, 1}}},
-        {2, "", {{0, 1, 0}, {0, 1, 0}, {1, 1, 1}}},
-        {3, "", {{0, 1, 0}, {1, 1, 1}, {0, 1, 0}}},
-        {4, "", {{0, 0, 1}, {1, 1, 1}, {1, 0, 0}}},
-        {5, "", {{0, 1, 0}, {1, 1, 1}}},
-        {6, "", {{1, 1}, {1, 1}}},
-        {7, "", {{1, 0, 1}, {1, 1, 1}}},
-        {8, "", {{1, 1, 1}}},
-        {9, "", {{0, 1}, {1, 1}, {1, 0}}},
-        {10, "", {{1, 0}, {1, 1}}},
-        {11, "", {{0, 0, 1}, {0, 1, 1}, {1, 1, 0}}},
-        {12, "", {{1, 1}}},
-        {13, "", {{0, 1}, {1, 1}, {1, 0}, {1, 0}, {1, 1}}},
-        {14, "", {{1, 1, 1}, {1, 0, 0}, {1, 0, 0}, {1, 0, 0}, {1, 0, 0}}},
+  vector<Tiles> initTilesStandard() {
+    vector<Tiles> tiles_ = {
+        {1, 0, {{1, 0, 0}, {1, 1, 1}}},
+        {2, 0, {{0, 1, 0}, {0, 1, 0}, {1, 1, 1}}},
+        {3, 0, {{0, 1, 0}, {1, 1, 1}, {0, 1, 0}}},
+        {4, 0, {{0, 0, 1}, {1, 1, 1}, {1, 0, 0}}},
+        {5, 0, {{0, 1, 0}, {1, 1, 1}}},
+        {6, 0, {{1, 1}, {1, 1}}},
+        {7, 0, {{1, 0, 1}, {1, 1, 1}}},
+        {8, 0, {{1, 1, 1}}},
+        {9, 0, {{0, 1}, {1, 1}, {1, 0}}},
+        {10, 0, {{1, 0}, {1, 1}}},
+        {11, 0, {{0, 0, 1}, {0, 1, 1}, {1, 1, 0}}},
+        {12, 0, {{1, 1}}},
+        {13, 0, {{0, 1}, {1, 1}, {1, 0}, {1, 0}, {1, 1}}},
+        {14, 0, {{1, 1, 1}, {1, 0, 0}, {1, 0, 0}, {1, 0, 0}, {1, 0, 0}}},
         {15,
-         "",
+         0,
          {{0, 0, 0, 1, 0},
           {0, 0, 0, 1, 0},
           {0, 0, 0, 1, 1},
           {0, 1, 1, 1, 0},
           {1, 1, 0, 0, 0}}},
     };
+
+    return tiles_;
   }
 
   void initTilesFromNowere() {
@@ -199,7 +207,7 @@ class Game {
       Tiles tile;
       tile.id = tot;
       tile.tile = tileMatrix;
-      tile.playerName = "";
+      tile.playerName = 0;
       tileList.push_back(tile);
     }
 
