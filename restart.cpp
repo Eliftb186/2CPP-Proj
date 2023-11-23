@@ -288,6 +288,7 @@ class Game {
       }
     }
     tiles[0].playerName = player.colorInt;
+    // on supprime la tuile de la liste
     tiles.erase(tiles.begin());
   }
 
@@ -309,8 +310,8 @@ class Game {
       cin >> id;
     }
     // on ramène la tuile au début de la liste
-    tiles.erase(tiles.begin() + id - 1);
-    tiles.insert(tiles.begin(), tiles[id - 1]);
+    tiles.erase(tiles.begin() + id);
+    tiles.insert(tiles.begin(), tiles[id]);
   }
 
   void printCurrentTile() {
@@ -381,71 +382,86 @@ class Game {
 
   void play() {
     bool end = false;
+    int currentPlayerIndex = 0;
+
     while (!end) {
-      // on joue pour chaque joueur
-      for (int i = 0; i < players.size(); i++) {
+      system("clear");
+      printBoard();
+      cout << endl;
+      cout << players[currentPlayerIndex].name << " : " << endl;
+      printCurrentTile();
+      cout << endl;
+
+      int choice;
+      do {
         system("clear");
         printBoard();
-        cout << endl;
-        cout << players[i].name << " : " << endl;
         printCurrentTile();
-        cout << endl;
+        cout << "1 : place a tile" << endl;
+        cout << "2 : exchange a tile" << endl;
+        cout << "3 : rotate tile" << endl;
+        cout << "4 : flip tile" << endl;
+        cout << "Enter your choice : ";
+        cin >> choice;
 
-        int choice;
-        do {
+        while (choice < 1 || choice > 4) {
+          cout << "❌ Invalid choice ❌" << endl;
+          cout << "Enter your choice : ";
+          cin >> choice;
+        }
+
+        if (choice == 1) {
+          placeTile(players[currentPlayerIndex]);
+          currentPlayerIndex =
+              (currentPlayerIndex + 1) % players.size();  // Change player
+        } else if (choice == 2) {
+          system("clear");
+          printBoard();
+          exchangeTile();
           system("clear");
           printBoard();
           printCurrentTile();
-          cout << "1 : place a tile" << endl;
-          cout << "2 : exchange a tile" << endl;
-          cout << "3 : rotate tile" << endl;
-          cout << "4 : flip tile" << endl;
-          cout << "Enter your choice : ";
-          cin >> choice;
-
-          while (choice < 1 || choice > 4) {
-            cout << "❌ Invalid choice ❌" << endl;
-            cout << "Enter your choice : ";
-            cin >> choice;
-          }
-
-          if (choice == 1) {
-            placeTile(players[i]);
-          } else if (choice == 2) {
+          placeTile(players[currentPlayerIndex]);
+          currentPlayerIndex =
+              (currentPlayerIndex + 1) % players.size();  // Change player
+        } else if (choice == 3) {
+          int rotateChoice;
+          do {
             system("clear");
             printBoard();
-            exchangeTile();
+            rotateTile(tiles[0]);
             system("clear");
             printBoard();
             printCurrentTile();
-            placeTile(players[i]);
-          } else if (choice == 3) {
-            int rotateChoice;
-            do {
-              system("clear");
-              printBoard();
-              rotateTile(tiles[0]);
-              system("clear");
-              printBoard();
-              printCurrentTile();
-              cout << "Rotate again? (1: Yes, 0: No) : ";
-              cin >> rotateChoice;
-            } while (rotateChoice == 1);
-            system("clear");
-            printBoard();
-            printCurrentTile();
-            placeTile(players[i]);
-          } else if (choice == 4) {
+            cout << "Rotate again? (1: Yes, 0: No) : ";
+            cin >> rotateChoice;
+          } while (rotateChoice == 1);
+          system("clear");
+          printBoard();
+          printCurrentTile();
+          placeTile(players[currentPlayerIndex]);
+          currentPlayerIndex =
+              (currentPlayerIndex + 1) % players.size();  // Change player
+        } else if (choice == 4) {
+          int flipChoice;
+          do {
             system("clear");
             printBoard();
             flipTile(tiles[0]);
             system("clear");
             printBoard();
             printCurrentTile();
-            placeTile(players[i]);
-          }
-        } while (choice != 1);
-      }
+            cout << "Flip again? (1: Yes, 0: No) : ";
+            cin >> flipChoice;
+          } while (flipChoice == 1);
+          system("clear");
+          printBoard();
+          printCurrentTile();
+          placeTile(players[currentPlayerIndex]);
+          currentPlayerIndex =
+              (currentPlayerIndex + 1) % players.size();  // Change player
+        }
+      } while (choice != 1);
     }
   }
 };
