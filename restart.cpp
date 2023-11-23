@@ -1,6 +1,8 @@
 #include <algorithm>
+#include <chrono>
 #include <iostream>
 #include <map>
+#include <thread>
 #include <vector>
 using namespace std;
 
@@ -288,14 +290,13 @@ class Game {
       }
     }
     tiles[0].playerName = player.colorInt;
-    // on supprime la tuile de la liste
     tiles.erase(tiles.begin());
   }
 
   void exchangeTile() {
     // on affiche les 5 prochaines tuiles
     cout << endl;
-    cout << "Your next tiles : " << endl;
+    cout << "Your next tiles : (1 - 5)" << endl;
     for (int i = 0; i < 5; i++) {
       printTile(tiles[i]);
     }
@@ -309,9 +310,10 @@ class Game {
       cout << "Enter the tile's id you wanna exchange : ";
       cin >> id;
     }
-    // on ramène la tuile au début de la liste
-    tiles.erase(tiles.begin() + id);
-    tiles.insert(tiles.begin(), tiles[id]);
+    // on swap la tuile avec la première
+    Tiles temp = tiles[0];
+    tiles[0] = tiles[id - 1];
+    tiles[id - 1] = temp;
   }
 
   void printCurrentTile() {
@@ -358,26 +360,23 @@ class Game {
     return true;
   }
 
-  void flipTile(Tiles tile) { reverse(tile.tile.begin(), tile.tile.end()); }
+  Tiles flipTile(Tiles tile) {
+    Tiles flippedTile = tile;
+    reverse(flippedTile.tile.begin(), flippedTile.tile.end());
+    return flippedTile;
+  }
 
-  void rotateTile(Tiles tile) {
-    // Make a copy of the tile
+  Tiles rotateTile(Tiles tile) {
     Tiles rotatedTile = tile;
-
-    // Transposer la matrice
-    for (size_t i = 0; i < rotatedTile.tile.size(); ++i) {
-      for (size_t j = i + 1; j < rotatedTile.tile[i].size(); ++j) {
-        swap(rotatedTile.tile[i][j], rotatedTile.tile[j][i]);
+    vector<vector<int>> newTile(tile.tile[0].size(),
+                                vector<int>(tile.tile.size(), 0));
+    for (int i = 0; i < tile.tile.size(); i++) {
+      for (int j = 0; j < tile.tile[0].size(); j++) {
+        newTile[j][tile.tile.size() - 1 - i] = tile.tile[i][j];
       }
     }
-
-    // Inverser chaque ligne de la matrice
-    for (size_t i = 0; i < rotatedTile.tile.size(); ++i) {
-      reverse(rotatedTile.tile[i].begin(), rotatedTile.tile[i].end());
-    }
-
-    // Update the original tile with the rotated tile
-    tile = rotatedTile;
+    rotatedTile.tile = newTile;
+    return rotatedTile;
   }
 
   void play() {
@@ -412,8 +411,7 @@ class Game {
 
         if (choice == 1) {
           placeTile(players[currentPlayerIndex]);
-          currentPlayerIndex =
-              (currentPlayerIndex + 1) % players.size();  // Change player
+          currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
         } else if (choice == 2) {
           system("clear");
           printBoard();
@@ -422,14 +420,14 @@ class Game {
           printBoard();
           printCurrentTile();
           placeTile(players[currentPlayerIndex]);
-          currentPlayerIndex =
-              (currentPlayerIndex + 1) % players.size();  // Change player
+          currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
         } else if (choice == 3) {
           int rotateChoice;
           do {
             system("clear");
             printBoard();
-            rotateTile(tiles[0]);
+            tiles[0] = rotateTile(tiles[0]);
+            printTile(tiles[0]);
             system("clear");
             printBoard();
             printCurrentTile();
@@ -440,14 +438,13 @@ class Game {
           printBoard();
           printCurrentTile();
           placeTile(players[currentPlayerIndex]);
-          currentPlayerIndex =
-              (currentPlayerIndex + 1) % players.size();  // Change player
+          currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
         } else if (choice == 4) {
           int flipChoice;
           do {
             system("clear");
             printBoard();
-            flipTile(tiles[0]);
+            tiles[0] = flipTile(tiles[0]);
             system("clear");
             printBoard();
             printCurrentTile();
@@ -458,8 +455,7 @@ class Game {
           printBoard();
           printCurrentTile();
           placeTile(players[currentPlayerIndex]);
-          currentPlayerIndex =
-              (currentPlayerIndex + 1) % players.size();  // Change player
+          currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
         }
       } while (choice != 1);
     }
